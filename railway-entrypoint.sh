@@ -115,4 +115,9 @@ log "cgroup memory ${mem_mb}MB -> pm.max_children = ${children}"
 # Widen it before dropping.
 chmod 0666 /proc/self/fd/1 /proc/self/fd/2 2>/dev/null || log "could not widen stdout/stderr"
 
+# Automatické nastavení Moodle cronu pro odesílání e-mailů každou minutu
+if ! grep -q "admin/cli/cron.php" /etc/crontabs/root; then
+    echo "* * * * * su-exec 65534:65534 php -d max_input_vars=10000 /var/www/html/admin/cli/cron.php >/dev/null 2>&1" >> /etc/crontabs/root
+fi
+
 exec su-exec "${MOODLE_UID}:${MOODLE_GID}" /bin/docker-entrypoint.sh "$@"
