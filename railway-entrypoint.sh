@@ -115,13 +115,4 @@ log "cgroup memory ${mem_mb}MB -> pm.max_children = ${children}"
 # Widen it before dropping.
 chmod 0666 /proc/self/fd/1 /proc/self/fd/2 2>/dev/null || log "could not widen stdout/stderr"
 
-# --- 5. Moodle Cron ----------------------------------------------------------
-# Run Moodle's scheduled tasks every 60 seconds as uid 65534.
-(
-    while true; do
-        sleep 60
-        su-exec "${MOODLE_UID}:${MOODLE_GID}" php /var/www/html/admin/cli/cron.php >>/tmp/moodle-cron.log 2>&1 || true
-    done
-) &
-
 exec su-exec "${MOODLE_UID}:${MOODLE_GID}" /bin/docker-entrypoint.sh "$@"
